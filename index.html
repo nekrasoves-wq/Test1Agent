@@ -49,6 +49,29 @@
             animation: wave 2s ease-in-out infinite;
         }
         
+        .rabbit-image {
+            margin: 20px 0;
+        }
+        
+        .rabbit-image img {
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-20px);
+            }
+        }
+        
         .date {
             margin-top: 30px;
             font-size: 1rem;
@@ -97,6 +120,10 @@
             .emoji {
                 font-size: 3rem;
             }
+            .rabbit-image img {
+                width: 200px;
+                height: 200px;
+            }
         }
     </style>
 </head>
@@ -104,6 +131,9 @@
     <div class="container">
         <div class="emoji">👋</div>
         <h1>Привет, мир!</h1>
+        <div class="rabbit-image">
+            <img src="https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=400&h=400&fit=crop" alt="Милый заяц" />
+        </div>
         <p>Мой первый сайт на GitHub Pages</p>
         <p style="font-size: 1.2rem;">🚀 Сайт успешно запущен!</p>
         <div class="date">
