@@ -13,7 +13,7 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ff00ff 0%, #c71585 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -29,6 +29,8 @@
             border-radius: 20px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             animation: fadeIn 1s ease-in;
+            max-width: 600px;
+            width: 90%;
         }
         
         h1 {
@@ -110,6 +112,65 @@
             }
         }
         
+        .name-form {
+            margin-top: 30px;
+            width: 100%;
+        }
+        
+        .name-form h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .name-form input {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            transition: all 0.3s ease;
+        }
+        
+        .name-form input:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+        
+        .name-form button {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: white;
+            background: linear-gradient(135deg, #ff1493 0%, #ff69b4 100%);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .name-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 20, 147, 0.4);
+        }
+        
+        .result {
+            margin-top: 20px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #fff;
+            min-height: 30px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
         @media (max-width: 768px) {
             h1 {
                 font-size: 2.5rem;
@@ -124,6 +185,9 @@
                 width: 200px;
                 height: 200px;
             }
+            .name-form h2 {
+                font-size: 1.2rem;
+            }
         }
     </style>
 </head>
@@ -136,11 +200,47 @@
         </div>
         <p>Мой первый сайт на GitHub Pages</p>
         <p style="font-size: 1.2rem;">🚀 Сайт успешно запущен!</p>
+        
+        <form class="name-form" id="nameForm">
+            <h2>Введите ваши данные</h2>
+            <div class="form-group">
+                <input type="text" id="lastName" placeholder="Фамилия" required>
+            </div>
+            <div class="form-group">
+                <input type="text" id="firstName" placeholder="Имя" required>
+            </div>
+            <div class="form-group">
+                <input type="text" id="middleName" placeholder="Отчество">
+            </div>
+            <button type="submit">Отправить</button>
+            <div id="result" class="result"></div>
+        </form>
+        
         <div class="date">
             <script>
                 document.write('Создано: ' + new Date().toLocaleDateString('ru-RU'));
             </script>
         </div>
     </div>
+    
+    <script>
+        document.getElementById('nameForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const lastName = document.getElementById('lastName').value.trim();
+            const firstName = document.getElementById('firstName').value.trim();
+            const middleName = document.getElementById('middleName').value.trim();
+            
+            let fullName = lastName + ' ' + firstName;
+            if (middleName) {
+                fullName += ' ' + middleName;
+            }
+            
+            document.getElementById('result').innerHTML = '🎉 Привет, ' + fullName + '!';
+            
+            // Очистка формы (опционально)
+            // this.reset();
+        });
+    </script>
 </body>
 </html>
