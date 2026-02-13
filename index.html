@@ -13,7 +13,7 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #ff00ff 0%, #c71585 100%);
+            background: linear-gradient(135deg, #00ff00 0%, #228b22 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -162,6 +162,11 @@
             box-shadow: 0 5px 20px rgba(255, 20, 147, 0.4);
         }
         
+        .name-form button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
         .result {
             margin-top: 20px;
             font-size: 1.3rem;
@@ -169,6 +174,20 @@
             color: #fff;
             min-height: 30px;
             text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
         
         @media (max-width: 768px) {
@@ -212,7 +231,7 @@
             <div class="form-group">
                 <input type="text" id="middleName" placeholder="Отчество">
             </div>
-            <button type="submit">Отправить</button>
+            <button type="submit" id="submitBtn">Отправить</button>
             <div id="result" class="result"></div>
         </form>
         
@@ -224,22 +243,57 @@
     </div>
     
     <script>
-        document.getElementById('nameForm').addEventListener('submit', function(e) {
+        // ВАЖНО: Замените эту ссылку на URL вашего Google Apps Script
+        const GOOGLE_SCRIPT_URL = 'ВСТАВЬТЕ_СЮДА_URL_ОТ_GOOGLE_APPS_SCRIPT';
+        
+        document.getElementById('nameForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const lastName = document.getElementById('lastName').value.trim();
             const firstName = document.getElementById('firstName').value.trim();
             const middleName = document.getElementById('middleName').value.trim();
+            const submitBtn = document.getElementById('submitBtn');
+            const resultDiv = document.getElementById('result');
             
             let fullName = lastName + ' ' + firstName;
             if (middleName) {
                 fullName += ' ' + middleName;
             }
             
-            document.getElementById('result').innerHTML = '🎉 Привет, ' + fullName + '!';
+            // Показываем загрузку
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="loading"></span> Отправка...';
+            resultDiv.innerHTML = '';
             
-            // Очистка формы (опционально)
-            // this.reset();
+            try {
+                // Отправляем данные в Google Sheets
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        lastName: lastName,
+                        firstName: firstName,
+                        middleName: middleName,
+                        timestamp: new Date().toLocaleString('ru-RU')
+                    })
+                });
+                
+                // Показываем успех
+                resultDiv.innerHTML = '🎉 Привет, ' + fullName + '!<br><small>✅ Данные сохранены в Google Sheets</small>';
+                
+                // Очищаем форму
+                this.reset();
+                
+            } catch (error) {
+                console.error('Ошибка:', error);
+                resultDiv.innerHTML = '❌ Ошибка отправки. Проверьте настройки Google Apps Script';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Отправить';
+            }
         });
     </script>
 </body>
