@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Привет, мир!</title>
+    <title>AI Agent с базой данных</title>
     <style>
         * {
             margin: 0;
@@ -15,13 +15,16 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #00ff00 0%, #228b22 100%);
             min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            padding: 20px;
             color: white;
         }
         
         .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
             text-align: center;
             padding: 40px;
             background: rgba(255, 255, 255, 0.1);
@@ -29,24 +32,17 @@
             border-radius: 20px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             animation: fadeIn 1s ease-in;
-            max-width: 600px;
-            width: 90%;
+            margin-bottom: 30px;
         }
         
         h1 {
-            font-size: 4rem;
-            margin-bottom: 20px;
+            font-size: 3rem;
+            margin-bottom: 10px;
             animation: bounce 1s ease-in-out;
         }
         
-        p {
-            font-size: 1.5rem;
-            margin-bottom: 30px;
-            opacity: 0.9;
-        }
-        
         .emoji {
-            font-size: 5rem;
+            font-size: 4rem;
             display: inline-block;
             animation: wave 2s ease-in-out infinite;
         }
@@ -56,8 +52,8 @@
         }
         
         .rabbit-image img {
-            width: 300px;
-            height: 300px;
+            width: 200px;
+            height: 200px;
             border-radius: 50%;
             object-fit: cover;
             border: 5px solid rgba(255, 255, 255, 0.3);
@@ -66,67 +62,51 @@
         }
         
         @keyframes float {
-            0%, 100% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-20px);
-            }
-        }
-        
-        .date {
-            margin-top: 30px;
-            font-size: 1rem;
-            opacity: 0.7;
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
         }
         
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         @keyframes bounce {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
         
         @keyframes wave {
-            0%, 100% {
-                transform: rotate(0deg);
-            }
-            25% {
-                transform: rotate(20deg);
-            }
-            75% {
-                transform: rotate(-20deg);
-            }
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(20deg); }
+            75% { transform: rotate(-20deg); }
         }
         
-        .name-form {
-            margin-top: 30px;
-            width: 100%;
-        }
-        
-        .name-form h2 {
-            font-size: 1.5rem;
+        .section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
             margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .section h2 {
+            margin-bottom: 20px;
+            font-size: 1.8rem;
         }
         
         .form-group {
             margin-bottom: 15px;
         }
         
-        .name-form input {
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input {
             width: 100%;
             padding: 12px 20px;
             font-size: 1rem;
@@ -137,164 +117,421 @@
             transition: all 0.3s ease;
         }
         
-        .name-form input:focus {
+        .form-group input:focus {
             outline: none;
             background: rgba(255, 255, 255, 1);
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
         }
         
-        .name-form button {
-            width: 100%;
-            padding: 12px 20px;
+        button {
+            padding: 12px 30px;
             font-size: 1.1rem;
             font-weight: bold;
             color: white;
-            background: linear-gradient(135deg, #ff1493 0%, #ff69b4 100%);
+            background: linear-gradient(135deg, #228b22 0%, #006400 100%);
             border: none;
             border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 10px;
+            margin-right: 10px;
         }
         
-        .name-form button:hover {
+        button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(255, 20, 147, 0.4);
+            box-shadow: 0 5px 20px rgba(0, 100, 0, 0.4);
         }
         
-        .name-form button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
+        button.secondary {
+            background: linear-gradient(135deg, #666 0%, #444 100%);
+        }
+        
+        button.danger {
+            background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
         }
         
         .result {
             margin-top: 20px;
-            font-size: 1.3rem;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            font-size: 1.2rem;
+            display: none;
+        }
+        
+        .result.success {
+            background: rgba(76, 175, 80, 0.3);
+        }
+        
+        .result.error {
+            background: rgba(244, 67, 54, 0.3);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            color: #333;
+        }
+        
+        th {
+            background: #228b22;
+            color: white;
             font-weight: bold;
-            color: #fff;
-            min-height: 30px;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
         
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
+        tr:nth-child(even) {
+            background: rgba(34, 139, 34, 0.1);
         }
         
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        tr:hover {
+            background: rgba(34, 139, 34, 0.2);
+        }
+        
+        .actions button {
+            padding: 5px 15px;
+            font-size: 0.9rem;
+            margin: 2px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 150px;
+            margin: 10px;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .search-box input {
+            flex: 1;
+            padding: 12px 20px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.2rem;
         }
         
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5rem;
-            }
-            p {
-                font-size: 1.2rem;
-            }
-            .emoji {
-                font-size: 3rem;
-            }
-            .rabbit-image img {
-                width: 200px;
-                height: 200px;
-            }
-            .name-form h2 {
-                font-size: 1.2rem;
-            }
+            h1 { font-size: 2rem; }
+            .rabbit-image img { width: 150px; height: 150px; }
+            table { font-size: 0.9rem; }
+            .stats { flex-direction: column; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="emoji">👋</div>
-        <h1>Привет, мир!</h1>
-        <div class="rabbit-image">
-            <img src="https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=400&h=400&fit=crop" alt="Милый заяц" />
+        <!-- Шапка -->
+        <div class="header">
+            <div class="emoji">👋</div>
+            <h1>Привет, мир!</h1>
+            <div class="rabbit-image">
+                <img src="https://images.unsplash.com/photo-1585110396000-c9ffd4e4b308?w=400&h=400&fit=crop" alt="Милый заяц" />
+            </div>
+            <p style="font-size: 1.5rem;">Мой первый AI Agent</p>
+            <p style="font-size: 1.2rem;">🚀 С базой данных LocalStorage</p>
         </div>
-        <p>Мой первый AI Agent</p>
-        <p style="font-size: 1.2rem;">🚀 Сайт успешно запущен!</p>
         
-        <form class="name-form" id="nameForm">
-            <h2>Введите ваши данные</h2>
-            <div class="form-group">
-                <input type="text" id="lastName" placeholder="Фамилия" required>
+        <!-- Статистика -->
+        <div class="section">
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-number" id="totalUsers">0</div>
+                    <div class="stat-label">Всего записей</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="todayUsers">0</div>
+                    <div class="stat-label">Добавлено сегодня</div>
+                </div>
             </div>
-            <div class="form-group">
-                <input type="text" id="firstName" placeholder="Имя" required>
-            </div>
-            <div class="form-group">
-                <input type="text" id="middleName" placeholder="Отчество">
-            </div>
-            <button type="submit" id="submitBtn">Отправить</button>
+        </div>
+        
+        <!-- Форма добавления -->
+        <div class="section">
+            <h2>➕ Добавить пользователя</h2>
+            <form id="addForm">
+                <div class="form-group">
+                    <label>Фамилия:</label>
+                    <input type="text" id="lastName" required>
+                </div>
+                <div class="form-group">
+                    <label>Имя:</label>
+                    <input type="text" id="firstName" required>
+                </div>
+                <div class="form-group">
+                    <label>Отчество:</label>
+                    <input type="text" id="middleName">
+                </div>
+                <button type="submit">Добавить</button>
+                <button type="button" class="secondary" onclick="document.getElementById('addForm').reset()">Очистить</button>
+            </form>
             <div id="result" class="result"></div>
-        </form>
+        </div>
         
-        <div class="date">
-            <script>
-                document.write('Создано: ' + new Date().toLocaleDateString('ru-RU'));
-            </script>
+        <!-- Поиск -->
+        <div class="section">
+            <h2>🔍 Поиск и управление</h2>
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Поиск по имени, фамилии или отчеству...">
+                <button onclick="searchUsers()">Найти</button>
+                <button class="secondary" onclick="loadAllUsers()">Показать всех</button>
+                <button class="danger" onclick="clearDatabase()">Очистить базу</button>
+            </div>
+        </div>
+        
+        <!-- Таблица пользователей -->
+        <div class="section">
+            <h2>👥 База данных пользователей</h2>
+            <div id="usersTable"></div>
         </div>
     </div>
     
     <script>
-        // ВАЖНО: Замените эту ссылку на URL вашего Google Apps Script
-        const GOOGLE_SCRIPT_URL = 'ВСТАВЬТЕ_СЮДА_URL_ОТ_GOOGLE_APPS_SCRIPT';
+        // Класс для работы с LocalStorage базой данных
+        class LocalDatabase {
+            constructor() {
+                this.storageKey = 'users_database';
+            }
+            
+            // Получить всех пользователей
+            getAllUsers() {
+                const data = localStorage.getItem(this.storageKey);
+                return data ? JSON.parse(data) : [];
+            }
+            
+            // Сохранить всех пользователей
+            saveUsers(users) {
+                localStorage.setItem(this.storageKey, JSON.stringify(users));
+            }
+            
+            // Добавить пользователя
+            addUser(lastName, firstName, middleName) {
+                const users = this.getAllUsers();
+                const newUser = {
+                    id: Date.now(),
+                    lastName: lastName,
+                    firstName: firstName,
+                    middleName: middleName || '',
+                    createdAt: new Date().toLocaleString('ru-RU')
+                };
+                users.push(newUser);
+                this.saveUsers(users);
+                return newUser;
+            }
+            
+            // Удалить пользователя
+            deleteUser(id) {
+                let users = this.getAllUsers();
+                users = users.filter(user => user.id !== id);
+                this.saveUsers(users);
+            }
+            
+            // Поиск пользователей
+            searchUsers(searchTerm) {
+                const users = this.getAllUsers();
+                const term = searchTerm.toLowerCase();
+                return users.filter(user => 
+                    user.lastName.toLowerCase().includes(term) ||
+                    user.firstName.toLowerCase().includes(term) ||
+                    user.middleName.toLowerCase().includes(term)
+                );
+            }
+            
+            // Получить пользователей добавленных сегодня
+            getTodayUsers() {
+                const users = this.getAllUsers();
+                const today = new Date().toLocaleDateString('ru-RU');
+                return users.filter(user => 
+                    user.createdAt.startsWith(today)
+                ).length;
+            }
+            
+            // Очистить базу данных
+            clearAll() {
+                if (confirm('Вы уверены, что хотите удалить ВСЕ данные?')) {
+                    localStorage.removeItem(this.storageKey);
+                    return true;
+                }
+                return false;
+            }
+        }
         
-        document.getElementById('nameForm').addEventListener('submit', async function(e) {
+        // Инициализация базы данных
+        const db = new LocalDatabase();
+        
+        // Обновление статистики
+        function updateStats() {
+            const totalUsers = db.getAllUsers().length;
+            const todayUsers = db.getTodayUsers();
+            
+            document.getElementById('totalUsers').textContent = totalUsers;
+            document.getElementById('todayUsers').textContent = todayUsers;
+        }
+        
+        // Показать сообщение
+        function showMessage(message, type = 'success') {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = message;
+            resultDiv.className = `result ${type}`;
+            resultDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                resultDiv.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Отображение пользователей
+        function displayUsers(users) {
+            const tableDiv = document.getElementById('usersTable');
+            
+            if (users.length === 0) {
+                tableDiv.innerHTML = '<div class="empty-state">📭 База данных пуста. Добавьте первого пользователя!</div>';
+                return;
+            }
+            
+            let html = `
+                <table>
+                    <tr>
+                        <th>№</th>
+                        <th>Фамилия</th>
+                        <th>Имя</th>
+                        <th>Отчество</th>
+                        <th>Дата добавления</th>
+                        <th>Действия</th>
+                    </tr>
+            `;
+            
+            users.forEach((user, index) => {
+                html += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${user.lastName}</td>
+                        <td>${user.firstName}</td>
+                        <td>${user.middleName || '-'}</td>
+                        <td>${user.createdAt}</td>
+                        <td class="actions">
+                            <button class="danger" onclick="deleteUser(${user.id})">🗑️ Удалить</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            html += '</table>';
+            tableDiv.innerHTML = html;
+        }
+        
+        // Загрузка всех пользователей
+        function loadAllUsers() {
+            const users = db.getAllUsers();
+            displayUsers(users);
+            updateStats();
+            document.getElementById('searchInput').value = '';
+        }
+        
+        // Поиск пользователей
+        function searchUsers() {
+            const searchTerm = document.getElementById('searchInput').value;
+            if (!searchTerm.trim()) {
+                loadAllUsers();
+                return;
+            }
+            
+            const users = db.searchUsers(searchTerm);
+            displayUsers(users);
+            
+            if (users.length === 0) {
+                showMessage('Ничего не найдено', 'error');
+            }
+        }
+        
+        // Удаление пользователя
+        function deleteUser(id) {
+            if (confirm('Удалить этого пользователя?')) {
+                db.deleteUser(id);
+                loadAllUsers();
+                showMessage('✅ Пользователь удалён!');
+            }
+        }
+        
+        // Очистка базы данных
+        function clearDatabase() {
+            if (db.clearAll()) {
+                loadAllUsers();
+                showMessage('✅ База данных очищена!');
+            }
+        }
+        
+        // Обработка формы
+        document.getElementById('addForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             const lastName = document.getElementById('lastName').value.trim();
             const firstName = document.getElementById('firstName').value.trim();
             const middleName = document.getElementById('middleName').value.trim();
-            const submitBtn = document.getElementById('submitBtn');
-            const resultDiv = document.getElementById('result');
             
-            let fullName = lastName + ' ' + firstName;
-            if (middleName) {
-                fullName += ' ' + middleName;
+            if (!lastName || !firstName) {
+                showMessage('❌ Заполните обязательные поля!', 'error');
+                return;
             }
             
-            // Показываем загрузку
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="loading"></span> Отправка...';
-            resultDiv.innerHTML = '';
+            db.addUser(lastName, firstName, middleName);
             
-            try {
-                // Отправляем данные в Google Sheets
-                const response = await fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        lastName: lastName,
-                        firstName: firstName,
-                        middleName: middleName,
-                        timestamp: new Date().toLocaleString('ru-RU')
-                    })
-                });
-                
-                // Показываем успех
-                resultDiv.innerHTML = '🎉 Привет, ' + fullName + '!<br><small>✅ Данные сохранены в Google Sheets</small>';
-                
-                // Очищаем форму
-                this.reset();
-                
-            } catch (error) {
-                console.error('Ошибка:', error);
-                resultDiv.innerHTML = '❌ Ошибка отправки. Проверьте настройки Google Apps Script';
-            } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = 'Отправить';
+            showMessage(`🎉 Пользователь ${lastName} ${firstName} успешно добавлен!`);
+            
+            this.reset();
+            loadAllUsers();
+        });
+        
+        // Поиск по Enter
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchUsers();
             }
         });
+        
+        // Загрузка данных при старте
+        window.onload = function() {
+            loadAllUsers();
+        };
     </script>
 </body>
 </html>
